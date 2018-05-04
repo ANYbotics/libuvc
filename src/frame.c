@@ -212,6 +212,13 @@ uvc_error_t uvc_yuyv2bgr(uvc_frame_t *in, uvc_frame_t *out) {
   if (uvc_ensure_frame_size(out, in->width * in->height * 3) < 0)
     return UVC_ERROR_NO_MEM;
 
+  // IYUYV2BGR_8() crashes sometimes the software -> ignoring the first frame
+  // seems to solve this problem.
+  // TODO find a better solution.
+  if (in->sequence <= 1) {
+    return UVC_ERROR_NO_MEM;
+  }
+
   out->width = in->width;
   out->height = in->height;
   out->frame_format = UVC_FRAME_FORMAT_BGR;

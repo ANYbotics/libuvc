@@ -288,6 +288,17 @@ uvc_error_t uvc_open(
     return ret;
   }
 
+  // Resetting the device after connecting seems to solve the streaming problem
+  // (LIBUSB_TRANSFER_ERROR) and stopping at LIBUVC_NUM_TRANSFER_BUFS attempts.
+  // TODO find a better solution.
+  ret = libusb_reset_device(usb_devh);
+  UVC_DEBUG("libusb_reset_device() = %d", ret);
+
+  if (ret != UVC_SUCCESS) {
+    UVC_EXIT(ret);
+    return ret;
+  }
+
   uvc_ref_device(dev);
 
   internal_devh = calloc(1, sizeof(*internal_devh));
